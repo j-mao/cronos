@@ -1,0 +1,125 @@
+{% extends "exams/base.html" %}
+
+{% block title %}{{ request.resolver_match.kwargs.course_number }} {{ quiz.name }}{% endblock %}
+
+{% block breadcrumbs %}
+  <li class="breadcrumb-item">
+    <a href="{% url 'registrar:term' request.resolver_match.kwargs.year request.resolver_match.kwargs.season %}">
+      {{ request.resolver_match.kwargs.year }} {{ request.resolver_match.kwargs.season }}
+    </a>
+  </li>
+  <li class="breadcrumb-item">
+    <a href="{% url 'registrar:course' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number %}">
+      {{ request.resolver_match.kwargs.course_number }}
+    </a>
+  </li>
+  <li class="breadcrumb-item">
+    <a href="{% url 'exams:course' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number %}">
+      Quizzes
+    </a>
+  </li>
+  <li class="breadcrumb-item active" aria-current="page">
+    {{ quiz.name }}
+  </li>
+{% endblock %}
+
+{% block content %}
+
+  <h2>Settings for {{ quiz.name }}</h2>
+
+  <dl class="row">
+    <dt class="col-sm-3 col-md-2">Name</dt>
+    <dd class="col-sm-9 col-md-10">{{ quiz.name }}</dd>
+    <dt class="col-sm-3 col-md-2">Start time</dt>
+    <dd class="col-sm-9 col-md-10">{{ quiz.start }}</dd>
+    <dt class="col-sm-3 col-md-2">End time</dt>
+    <dd class="col-sm-9 col-md-10">{{ quiz.end }}</dd>
+  </dl>
+  <div class="row mb-4">
+    <div class="col offset-sm-3 offset-md-2">
+      <a href="{% url 'exams:quiz-edit' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number request.resolver_match.kwargs.quiz_identifier %}" class="btn btn-primary">
+        Edit
+      </a>
+      <a href="{% url 'exams:accommodation-summary' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number request.resolver_match.kwargs.quiz_identifier %}" class="btn btn-success">
+        Accommodations
+      </a>
+      <a href="{% url 'exams:quiz-delete' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number request.resolver_match.kwargs.quiz_identifier %}" class="btn btn-danger">
+        Delete
+      </a>
+    </div>
+  </div>
+
+  <h2>Accommodations for {{ quiz.name }}</h2>
+
+  <p class="lead">
+    You currently have the following accommodations arrangements.
+  </p>
+
+  <table class="table table-hover table-sm">
+    <thead>
+      <tr>
+        <th>Location</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Comments</th>
+        <th># students</th>
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      {% for accommodation in accommodations %}
+        <tr>
+          <td>{{ accommodation.location }}</td>
+          <td>{{ accommodation.start }}</td>
+          <td>{{ accommodation.end }}</td>
+          <td>{{ accommodation.comments }}</td>
+          <td>{{ accommodation.accommodation_requests.count }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan=5>
+            <em>(None)</em>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="lead">
+  Below is your inbox of accommodations requests.
+  </p>
+
+  <div class="table-responsive-sm">
+    <table class="table table-hover table-sm">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>First name</th>
+          <th>Last name</th>
+          <th>Accommodation</th>
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        {% for accommodation_request in accommodation_requests %}
+          <tr>
+            <td>
+              <a href="{% url 'exams:accommodation-request' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number request.resolver_match.kwargs.quiz_identifier accommodation_request.student.username %}">{{ accommodation_request.student.username }}</a>
+              {% if not accommodation_request.read %}
+                <span class="badge text-bg-danger">Updated</span>
+              {% endif %}
+            </td>
+            <td>{{ accommodation_request.student.first_name }}</td>
+            <td>{{ accommodation_request.student.last_name }}</td>
+            <td>{{ accommodation_request.accommodation }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan=4>
+              <em>(None)</em>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}

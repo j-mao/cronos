@@ -1,0 +1,105 @@
+{% extends "exams/base.html" %}
+
+{% block title %}Quizzes in {{ request.resolver_match.kwargs.course_number }}{% endblock %}
+
+{% block breadcrumbs %}
+  <li class="breadcrumb-item">
+    <a href="{% url 'registrar:term' request.resolver_match.kwargs.year request.resolver_match.kwargs.season %}">
+      {{ request.resolver_match.kwargs.year }} {{ request.resolver_match.kwargs.season }}
+    </a>
+  </li>
+  <li class="breadcrumb-item">
+    <a href="{% url 'registrar:course' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number %}">
+      {{ request.resolver_match.kwargs.course_number }}
+    </a>
+  </li>
+  <li class="breadcrumb-item active" aria-current="page">
+    Quizzes
+  </li>
+{% endblock %}
+
+{% block content %}
+
+  <table class="table table-hover table-sm">
+    <thead>
+      <tr>
+        <th>Quiz</th>
+        <th>Start</th>
+        <th>End</th>
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      {% for quiz in quizzes %}
+        <tr>
+          <td>
+            <a href="{% url 'exams:quiz' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number quiz.identifier %}">
+              {{ quiz.name }}
+            </a></td>
+          <td>
+            {% if quiz.accommodated %}
+              <small class="text-muted">{{ quiz.start }}</small>
+              <br>
+              <em>See accommodation.</em>
+            {% else %}
+              {{ quiz.start }}
+            {% endif %}
+          </td>
+          <td>
+            {% if quiz.accommodated %}
+              <small class="text-muted">{{ quiz.end }}</small>
+              <br>
+              <em>See accommodation.</em>
+            {% else %}
+              {{ quiz.end }}
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan=3>
+            <em>(None)</em>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if form %}
+    <div class="card">
+      <div class="card-header">
+        Add new quiz
+      </div>
+      <div class="card-body">
+        <form action="?" method="POST">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="row">
+            <label for="{{ form.name.id_for_label }}" class="col-sm-3 col-form-label mb-1">
+              Name
+            </label>
+            <div class="col-sm-9 mb-3">
+              {{ form.name }}
+              {{ form.name.errors }}
+            </div>
+            <label for="{{ form.start.id_for_label }}" class="col-sm-3 col-form-label mb-1">
+              Start time
+            </label>
+            <div class="col-sm-9 mb-3">
+              {{ form.start }}
+              {{ form.start.errors }}
+            </div>
+            <label for="{{ form.end.id_for_label }}" class="col-sm-3 col-form-label mb-1">
+              End time
+            </label>
+            <div class="col-sm-9 mb-3">
+              {{ form.end }}
+              {{ form.end.errors }}
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
+{% endblock %}

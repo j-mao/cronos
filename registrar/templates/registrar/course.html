@@ -1,0 +1,81 @@
+{% extends "registrar/base.html" %}
+
+{% block title %}{{ request.resolver_match.kwargs.course_number }}: {{ course.name }}{% endblock %}
+
+{% block breadcrumbs %}
+  <li class="breadcrumb-item">
+    <a href="{% url 'registrar:term' request.resolver_match.kwargs.year request.resolver_match.kwargs.season %}">
+      {{ request.resolver_match.kwargs.year }} {{ request.resolver_match.kwargs.season }}
+    </a>
+  </li>
+  <li class="breadcrumb-item active" aria-current="page">
+    {{ request.resolver_match.kwargs.course_number }}: {{ course.name }}
+  </li>
+{% endblock %}
+
+{% block content %}
+
+  <dl class="row">
+    <dt class="col-sm-3 col-md-2">Course title</dt>
+    <dd class="col-sm-9 col-md-10">{{ course.name }}</dd>
+    <dt class="col-sm-3 col-md-2">Instructors</dt>
+    <dd class="col-sm-9 col-md-10">
+      {% for instructor in course.instructors.all %}
+        {{ instructor.first_name }} {{ instructor.last_name }}{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </dd>
+    {% if is_instructor %}
+      <dt class="col-sm-3 col-md-2">Access code</dt>
+      <dd class="col-sm-9 col-md-10">{{ course.access_code }}</dd>
+    {% endif %}
+  </dl>
+  {% if is_instructor %}
+  <div class="row mb-4">
+    <div class="col offset-sm-3 offset-md-2">
+      <a href="{% url 'registrar:course-edit' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number %}" class="btn btn-primary">
+        Edit
+      </a>
+      <a href="{% url 'registrar:course-delete' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number %}" class="btn btn-danger">
+        Delete
+      </a>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if is_instructor or is_student %}
+    <h2>Available services</h2>
+    <ul>
+      <li>
+        <a href="{% url 'exams:course' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number %}">
+          Quizzes and accommodations
+        </a>
+      </li>
+    </ul>
+  {% endif %}
+  {% if not is_instructor and not is_student %}
+    <div class="card">
+      <div class="card-body">
+        <p class="lead">
+          You have not joined this class on Cronos.
+        </p>
+        <form action="?" method="POST">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="row">
+            <label for="{{ form.access_code.id_for_label }}" class="col-sm-3 col-md-2 col-form-label mb-1">
+              Access code
+            </label>
+            <div class="col-sm-9 col-md-10 mb-3">
+              {{ form.access_code }}
+              {{ form.access_code.errors }}
+            </div>
+            <div class="col offset-sm-3 offset-md-2 mb-3">
+              <button type="submit" class="btn btn-primary">Join</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
+{% endblock %}

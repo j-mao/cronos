@@ -1,0 +1,37 @@
+{% extends "registrar/base.html" %}
+
+{% block title %}Delete {{ course.name }}{% endblock %}
+
+{% block breadcrumbs %}
+  <li class="breadcrumb-item">
+    <a href="{% url 'registrar:term' request.resolver_match.kwargs.year request.resolver_match.kwargs.season %}">
+      {{ request.resolver_match.kwargs.year }} {{ request.resolver_match.kwargs.season }}
+    </a>
+  </li>
+  <li class="breadcrumb-item">
+    <a href="{% url 'registrar:course' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number %}">
+      {{ request.resolver_match.kwargs.course_number }}
+    </a>
+  </li>
+  <li class="breadcrumb-item active" aria-current="page">
+    Delete
+  </li>
+{% endblock %}
+
+{% block content %}
+
+  <h2>You are about to delete {{ request.resolver_match.kwargs.course_number }}: {{ course.name }}.</h2>
+
+  <form action="?" method="POST">
+    {% csrf_token %}
+    <p class="lead">
+      Are you sure you wish to proceed?
+      This action cannot be undone.
+    </p>
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a href="{% url 'registrar:course' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number %}" class="btn btn-secondary">
+      Cancel
+    </a>
+  </form>
+
+{% endblock %}

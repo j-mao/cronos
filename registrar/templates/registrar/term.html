@@ -1,0 +1,99 @@
+{% extends "registrar/base.html" %}
+
+{% block title %}Courses in {{ request.resolver_match.kwargs.year }} {{ request.resolver_match.kwargs.season }}{% endblock %}
+
+{% block breadcrumbs %}
+  <li class="breadcrumb-item active" aria-current="page">
+    {{ request.resolver_match.kwargs.year }} {{ request.resolver_match.kwargs.season }}
+  </li>
+{% endblock %}
+
+{% block content %}
+
+  <h2>Course listing</h2>
+
+  <table class="table table-hover table-sm">
+    <thead>
+      <tr>
+        <th>Number</th>
+        <th>Title</th>
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      {% for listing in listings %}
+        <tr>
+          <td>
+            <a href="{% url 'registrar:course' request.resolver_match.kwargs.year request.resolver_match.kwargs.season listing.number %}">
+              {{ listing.number }}
+            </a>
+          </td>
+          <td>{{ listing.course.name }}</td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan=2>
+            <em>(None)</em>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if form %}
+    <div class="card">
+      <div class="card-header">
+        Add new course
+      </div>
+      <div class="card-body">
+        <form action="?" method="POST">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          <div class="row">
+            <label for="{{ form.numbers.id_for_label }}" class="col-sm-4 col-md-3 col-lg-2 col-form-label mb-1">
+              Course numbers
+            </label>
+            <div class="col-sm-8 col-md-9 col-lg-10 mb-3">
+              {{ form.numbers }}
+              <small class="text-muted">MIT course number, such as 6.1220. Use commas to separate multiple numbers in joint offerings.</small>
+              {{ form.numbers.errors }}
+            </div>
+            <label for="{{ form.name.id_for_label }}" class="col-sm-4 col-md-3 col-lg-2 col-form-label mb-1">
+              Course title
+            </label>
+            <div class="col-sm-8 col-md-9 col-lg-10 mb-3">
+              {{ form.name }}
+              <small class="text-muted">MIT course title, such as <em>Design and Analysis of Algorithms</em>.</small>
+              {{ form.name.errors }}
+            </div>
+            <label for="{{ form.season.id_for_label }}" class="col-sm-4 col-md-3 col-lg-2 col-form-label mb-1">
+              Term
+            </label>
+            <div class="col mb-3">
+              {{ form.season }}
+              <small class="text-muted">Season</small>
+              {{ form.season.errors }}
+            </div>
+            <div class="col mb-3">
+              {{ form.year }}
+              <small class="text-muted">Year</small>
+              {{ form.year.errors }}
+            </div>
+            <div class="col-12"></div>
+            <label for="{{ form.instructor_usernames.id_for_label }}" class="col-sm-4 col-md-3 col-lg-2 col-form-label mb-1">
+              Instructors
+            </label>
+            <div class="col-sm-8 col-md-9 col-lg-10 mb-3">
+              {{ form.instructor_usernames }}
+              <small class="text-muted">Comma-separated list of Kerberos usernames.</small>
+              {{ form.instructor_usernames.errors }}
+            </div>
+            <div class="offset-sm-4 offset-md-3 offset-lg-2 mb-3">
+              <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+
+{% endblock %}

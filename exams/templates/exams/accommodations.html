@@ -1,0 +1,68 @@
+{% extends "exams/base.html" %}
+
+{% block title %}{{ request.resolver_match.kwargs.course_number }} {{ quiz.name }}{% endblock %}
+
+{% block breadcrumbs %}
+  <li class="breadcrumb-item">
+    <a href="{% url 'registrar:term' request.resolver_match.kwargs.year request.resolver_match.kwargs.season %}">
+      {{ request.resolver_match.kwargs.year }} {{ request.resolver_match.kwargs.season }}
+    </a>
+  </li>
+  <li class="breadcrumb-item">
+    <a href="{% url 'registrar:course' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number %}">
+      {{ request.resolver_match.kwargs.course_number }}
+    </a>
+  </li>
+  <li class="breadcrumb-item">
+    <a href="{% url 'exams:course' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number %}">
+      Quizzes
+    </a>
+  </li>
+  <li class="breadcrumb-item">
+    <a href="{% url 'exams:quiz' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number request.resolver_match.kwargs.quiz_identifier %}">
+      {{ quiz.name }}
+    </a>
+  </li>
+  <li class="breadcrumb-item active" aria-current="page">
+    Accommodations summary
+  </li>
+{% endblock %}
+
+{% block content %}
+
+  <div class="table-responsive-sm">
+    <table class="table table-hover table-sm">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>First name</th>
+          <th>Last name</th>
+          <th>Location</th>
+          <th>Start time</th>
+          <th>End time</th>
+          <th>Comments</th>
+        </tr>
+      </thead>
+      <tbody class="table-group-divider">
+        {% for accommodation_request in accommodation_requests %}
+          <tr>
+            <td>{{ accommodation_request.student.username }}</td>
+            <td>{{ accommodation_request.student.first_name }}</td>
+            <td>{{ accommodation_request.student.last_name }}</td>
+            <td>{{ accommodation_request.accommodation.location }}</td>
+            <td>{{ accommodation_request.accommodation.start }}</td>
+            <td>{{ accommodation_request.accommodation.end }}</td>
+            <td>{{ accommodation_request.accommodation.comments }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan=7>
+              <em>(None)</em>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}

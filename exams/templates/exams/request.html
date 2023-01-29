@@ -1,0 +1,189 @@
+{% extends "exams/base.html" %}
+
+{% block title %}{{ request.resolver_match.kwargs.course_number }} {{ quiz.name }}{% endblock %}
+
+{% block breadcrumbs %}
+  <li class="breadcrumb-item">
+    <a href="{% url 'registrar:term' request.resolver_match.kwargs.year request.resolver_match.kwargs.season %}">
+      {{ request.resolver_match.kwargs.year }} {{ request.resolver_match.kwargs.season }}
+    </a>
+  </li>
+  <li class="breadcrumb-item">
+    <a href="{% url 'registrar:course' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number %}">
+      {{ request.resolver_match.kwargs.course_number }}
+    </a>
+  </li>
+  <li class="breadcrumb-item">
+    <a href="{% url 'exams:course' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number %}">
+      Quizzes
+    </a>
+  </li>
+  {% if is_instructor %}
+    <li class="breadcrumb-item">
+      <a href="{% url 'exams:quiz' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number request.resolver_match.kwargs.quiz_identifier %}">
+        {{ quiz.name }}
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page">
+      Request from {{ request.resolver_match.kwargs.username }}
+    </li>
+  {% else %}
+    <li class="breadcrumb-item active" aria-current="page">
+      {{ quiz.name }}
+    </li>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+
+  <h2>
+    Accommodation request for
+    {{ student.first_name }} {{ student.last_name }}
+    ({{ request.resolver_match.kwargs.username }})
+    on
+    {{ quiz.name }}
+  </h2>
+
+  {% if accommodation %}
+    <div class="alert alert-success" role="alert">
+      Assigned accommodation: {{ accommodation }}
+    </div>
+  {% else %}
+    <div class="alert alert-primary" role="alert">
+      No accommodation assigned.
+    </div>
+  {% endif %}
+
+  <div class="card mb-3">
+    <div class="card-header">
+      New message
+    </div>
+    <div class="card-body">
+      <form action="?accommodation={{ request.GET.accommodation|urlencode }}" method="POST">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        {% if is_instructor %}
+          <div class="row">
+            <div class="col-sm-4 col-md-3 col-lg-2 mb-1">
+              Accommodation
+              <p class="text-muted">
+                <small>
+                  Please select an option before writing a message.
+                </small>
+              </p>
+            </div>
+            <div class="col mb-3">
+              {% for value, spec in accommodation_types.items %}
+                <div class="form-check">
+                  <input
+                      type="radio"
+                      id="{{ value }}"
+                      name="accommodation-type"
+                      class="form-check-input"
+                      {% if request.GET.accommodation == value %}
+                        checked
+                      {% else %}
+                        onclick="window.location = '?accommodation={{ value|urlencode }}'; return false;"
+                      {% endif %}
+                  >
+                  <label class="form-check-label" for="{{ value }}">{{ spec.display }}</label>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="row">
+            {% if request.GET.accommodation == "accommodation-use-existing" %}
+              <div class="col-sm-4 col-md-3 col-lg-2 mb-1">
+                Choose accommodation
+              </div>
+              <div class="col mb-3">
+                {{ form.accommodation }}
+                {{ form.accommodation.errors }}
+              </div>
+            {% endif %}
+            {% if request.GET.accommodation == "accommodation-create-new" %}
+              <label for="{{ form.location.id_for_label }}" class="col-sm-4 col-md-3 col-lg-2 col-form-label mb-1">
+                Location
+              </label>
+              <div class="col-sm-8 col-md-9 col-lg-10 mb-3">
+                {{ form.location }}
+                <small class="text-muted">Room number. For example, 32-155.</small>
+                {{ form.location.errors }}
+              </div>
+              <label for="{{ form.start.id_for_label }}" class="col-sm-4 col-md-3 col-lg-2 col-form-label mb-1">
+                Start time
+              </label>
+              <div class="col-sm-8 col-md-9 col-lg-10 mb-3">
+                {{ form.start }}
+                {{ form.start.errors }}
+              </div>
+              <label for="{{ form.end.id_for_label }}" class="col-sm-4 col-md-3 col-lg-2 col-form-label mb-1">
+                End time
+              </label>
+              <div class="col-sm-8 col-md-9 col-lg-10 mb-3">
+                {{ form.end }}
+                {{ form.end.errors }}
+              </div>
+              <label for="{{ form.comments.id_for_label }}" class="col-sm-4 col-md-3 col-lg-2 col-form-label mb-1">
+                Special comments
+              </label>
+              <div class="col-sm-8 col-md-9 col-lg-10 mb-3">
+                {{ form.comments }}
+                <small class="text-muted">
+                  Special comments for the proctor, if any.
+                  The student can also see these notes.
+                </small>
+                {{ form.comments.errors }}
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+        <div class="row">
+          <label for="{{ form.body.id_for_label }}" class="col-sm-4 col-md-3 col-lg-2 col-form-label mb-1">
+            Message
+          </label>
+          <div class="col-sm-8 col-md-9 col-lg-10 mb-3">
+            {{ form.body }}
+            {{ form.body.errors }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col offset-sm-4 offset-md-3 offset-lg-2 mb-3">
+            <button type="submit" class="btn btn-primary">Send</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% for message in messages %}
+    <div class="card mb-3">
+      <div class="card-body">
+        <h5 class="card-title">
+          {{ message.created }}
+        </h5>
+        <h6 class="card-subtitle mb-2 text-muted">
+          {{ message.author.first_name }} {{ message.author.last_name }}
+          <small>
+            {% if message.update_accommodation and message.accommodation %}
+              <span class="text-success">
+                assigned accommodation:
+                <span class="fw-light">{{ message.accommodation }}</span>
+              </span>
+            {% elif message.update_accommodation %}
+              <span class="text-danger">
+                canceled accomodations.
+              </p>
+            {% else %}
+              said:
+            {% endif %}
+          </small>
+        </h6>
+        <p class="card-text">
+          {{ message.body|linebreaks }}
+        </p>
+      </div>
+    </div>
+  {% endfor %}
+
+{% endblock %}

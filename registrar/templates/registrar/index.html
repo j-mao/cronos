@@ -1,0 +1,21 @@
+{% extends "registrar/base.html" %}
+
+{% block title %}Cronos{% endblock %}
+
+{% block content %}
+
+  <h2>Welcome to Cronos</h2>
+
+  <p class="lead">Select a term to begin.</p>
+
+  <ul>
+    {% for term in terms %}
+      <li>
+        <a href="{% url 'registrar:term' term.year term.season %}">
+          {{ term.year }} {{ term.season }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+
+{% endblock %}
