@@ -4,6 +4,8 @@ from django.db import transaction
 from django.forms import inlineformset_factory
 from django.utils.text import gettext_lazy as _
 
+from cronos.authentication import get_or_create_mit_user
+
 from .models import Course, CourseListing, Term, TermSeason, User
 
 
@@ -61,7 +63,9 @@ class CourseForm(forms.ModelForm):
     def clean_instructor_usernames(self):
         usernames = {username.strip() for username in self.cleaned_data["instructor_usernames"].split(",")}
         for username in usernames:
-            if not User.objects.filter(username=username).exists():
+            try:
+                get_or_create_mit_user(username)
+            except ValueError:
                 raise ValidationError(
                     _("Unknown username."),
                     code="unknown_username",

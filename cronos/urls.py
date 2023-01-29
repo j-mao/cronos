@@ -16,8 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+from cronos import authentication
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("exams/", include("exams.urls")),
+    path("login/", authentication.kerberos_login, name="login"),
     path("registrar/", include("registrar.urls")),
 ]

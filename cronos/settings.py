@@ -50,6 +50,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "cronos.middleware.TimezoneMiddleware",
+    "cronos.middleware.ScriptsRemoteUserMiddleware",
 ]
 
 ROOT_URLCONF = "cronos.urls"
@@ -88,6 +89,15 @@ DATABASES = {
 # https://docs.djangoproject.com/en/4.0/topics/auth/customizing
 
 AUTH_USER_MODEL = "registrar.User"
+
+AUTHENTICATION_BACKENDS = [
+    "cronos.authentication.ScriptsRemoteUserBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+MIT_SCRIPT_PREFIX = "/cronos"
+LOGIN_URL = MIT_SCRIPT_PREFIX + "/login/"
+LOGIN_REDIRECT_URL = MIT_SCRIPT_PREFIX + "/registrar/"
 
 
 # Password validation
