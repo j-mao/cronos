@@ -1,0 +1,29 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.3.0
+    hooks:
+      - id: check-merge-conflict
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: ["--fix=lf"]
+      - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+      - id: flake8-conda
+        name: flake8-conda
+        entry: flake8
+        language: conda
+        require_serial: true
+        types_or: [python, pyi]
+        args: ["--max-line-length=512", "--max-complexity=18"]
+        exclude: .*/migrations
+
+      - id: isort-conda
+        name: isort-conda
+        entry: isort
+        language: conda
+        require_serial: true
+        types_or: [python, pyi]
+        args: ["--filter-files"]
+        exclude: .*/migrations
