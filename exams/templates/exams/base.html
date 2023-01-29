@@ -12,6 +12,14 @@
     <nav class="navbar bg-info mb-4">
       <div class="container">
         <a class="navbar-brand" href="{% url 'registrar:index' %}">Cronos</a>
+        <span class="navbar-text">
+          {% if user.is_authenticated %}
+            <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+            ({{ user.username }})
+          {% else %}
+            Not logged in
+          {% endif %}
+        </span>
       </div>
     </nav>
     <div class="container">
