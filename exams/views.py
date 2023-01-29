@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef
 from django.http import HttpResponseRedirect
@@ -15,6 +16,7 @@ from .forms import (MessageCreateNewAccommodationForm,
 from .models import Accommodation, AccommodationRequest, Message, Quiz
 
 
+@login_required
 def course(request, *, year, season, course_number):
     course = get_object_or_404(
         Course.objects.all(),
@@ -41,6 +43,7 @@ def course(request, *, year, season, course_number):
     return render(request, "exams/course.html", {"form": form, "course": course, "quizzes": quizzes, "is_instructor": is_instructor})
 
 
+@login_required
 def quiz(request, *, year, season, course_number, quiz_identifier):
     course = get_object_or_404(
         Course.objects.all(),
@@ -65,6 +68,7 @@ def quiz(request, *, year, season, course_number, quiz_identifier):
     return render(request, "exams/quiz.html", {"quiz": quiz, "accommodations": accommodations, "accommodation_requests": accommodation_requests})
 
 
+@login_required
 def quiz_edit(request, *, year, season, course_number, quiz_identifier):
     course = get_object_or_404(
         Course.objects.all(),
@@ -93,6 +97,7 @@ def quiz_edit(request, *, year, season, course_number, quiz_identifier):
     return render(request, "exams/quiz_edit.html", {"form": form, "quiz": quiz})
 
 
+@login_required
 def quiz_delete(request, *, year, season, course_number, quiz_identifier):
     course = get_object_or_404(
         Course.objects.all(),
@@ -113,6 +118,7 @@ def quiz_delete(request, *, year, season, course_number, quiz_identifier):
     return render(request, "exams/quiz_delete.html", {"quiz": quiz})
 
 
+@login_required
 def accommodation_summary(request, *, year, season, course_number, quiz_identifier):
     course = get_object_or_404(
         Course.objects.all(),
@@ -131,6 +137,7 @@ def accommodation_summary(request, *, year, season, course_number, quiz_identifi
     return render(request, "exams/accommodations.html", {"quiz": quiz, "accommodation_requests": accommodation_requests})
 
 
+@login_required
 def accommodation_request(request, *, year, season, course_number, quiz_identifier, username):
     course = get_object_or_404(
         Course.objects.all(),

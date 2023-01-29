@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render, reverse
@@ -6,11 +7,13 @@ from .forms import ClassJoinForm, CourseForm
 from .models import Course, CourseListing, Term
 
 
+@login_required
 def index(request):
     terms = Term.objects.filter(courses__isnull=False).distinct().order_by("-year", "-season")
     return render(request, "registrar/index.html", {"terms": terms})
 
 
+@login_required
 def term(request, *, year, season):
     term = get_object_or_404(
         Term.objects.all(),
@@ -35,6 +38,7 @@ def term(request, *, year, season):
     return render(request, "registrar/term.html", {"form": form, "listings": listings})
 
 
+@login_required
 def course(request, *, year, season, course_number):
     course = get_object_or_404(
         Course.objects.all(),
@@ -59,6 +63,7 @@ def course(request, *, year, season, course_number):
     return render(request, "registrar/course.html", {"form": form, "course": course, "is_instructor": is_instructor, "is_student": is_student})
 
 
+@login_required
 def course_edit(request, *, year, season, course_number):
     course = get_object_or_404(
         Course.objects.all(),
@@ -78,6 +83,7 @@ def course_edit(request, *, year, season, course_number):
     return render(request, "registrar/course_edit.html", {"form": form, "course": course})
 
 
+@login_required
 def course_delete(request, *, year, season, course_number):
     course = get_object_or_404(
         Course.objects.all(),
