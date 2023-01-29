@@ -100,6 +100,15 @@ LOGIN_URL = MIT_SCRIPT_PREFIX + "/login/"
 LOGIN_REDIRECT_URL = MIT_SCRIPT_PREFIX + "/registrar/"
 
 
+# Emails
+# https://docs.djangoproject.com/en/4.1/topics/email/#smtp-backend
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "outgoing.mit.edu"
+EMAIL_PORT = 25
+DEFAULT_FROM_EMAIL = "cronos-no-reply@mit.edu"
+
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 

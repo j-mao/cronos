@@ -1,3 +1,4 @@
+from django.core.mail import send_mail
 from django.db import models, transaction
 from django.utils.timezone import localtime
 
@@ -62,3 +63,20 @@ class Message(models.Model):
             if self.request.accommodation != latest.accommodation:
                 self.request.accommodation = latest.accommodation
                 self.request.save(update_fields=["accommodation"])
+        # Send mail to notify of update
+        recipients = (
+            list(self.request.quiz.course.instructors.all())
+            if self.author == self.request.student
+            else [self.request.student]
+        )
+        send_mail(
+            subject=f"[cronos] Accommodation request for {self.request.quiz.name}",
+            message=f"""
+Hello! There was an update to the accommodation request by {self.request.student.username} for {self.request.quiz.name}.
+Please visit Cronos to view the message.
+
+Do not reply to this email.
+            """,
+            from_email=None,
+            recipient_list=[recipient.email for recipient in recipients],
+        )
