@@ -3,10 +3,11 @@
 
 import ldap
 import ldap.filter
-from django.contrib.auth import REDIRECT_FIELD_NAME, get_user_model, login
+from django.contrib.auth import REDIRECT_FIELD_NAME, get_user_model
 from django.contrib.auth.backends import RemoteUserBackend
 from django.db import transaction
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.urls import reverse
 
 
@@ -63,9 +64,7 @@ def get_or_create_mit_user(username):
 
 def kerberos_login(request, **kwargs):
     host = request.META["HTTP_HOST"].split(":")[0]
-    if host in ("localhost", "127.0.0.1"):
-        return login(request, **kwargs)
-    elif request.META["SERVER_PORT"] == "444":
+    if request.META["SERVER_PORT"] == "444":
         if request.user.is_authenticated:
             # They're already authenticated --- go ahead and redirect
             redirect_field_name = kwargs.get("redirect_field_name", REDIRECT_FIELD_NAME)
@@ -74,7 +73,7 @@ def kerberos_login(request, **kwargs):
                 redirect_to = reverse("registrar:index")
             return HttpResponseRedirect(redirect_to)
         else:
-            return login(request, **kwargs)
+            return render(request, "registrar/login_required.html")
     else:
         # Move to port 444
         redirect_to = f"https://{host}:444{request.get_full_path()}"
