@@ -129,7 +129,7 @@ class MessageCreateNewAccommodationForm(AbstractMessageForm):
         return make_aware(datetime.datetime.fromisoformat(self.cleaned_data["end"]))
 
     def save(self, commit: bool = True):
-        instance = super().save(commit=commit)
+        instance = super().save(commit=False)
         instance.accommodation = Accommodation.objects.create(
             quiz=self._quiz,
             location=self.cleaned_data["location"],
@@ -138,5 +138,6 @@ class MessageCreateNewAccommodationForm(AbstractMessageForm):
             comments=self.cleaned_data["comments"],
         )
         if commit:
-            instance.save(update_fields=["accommodation"])
+            instance.save()
+            self.save_m2m()
         return instance
