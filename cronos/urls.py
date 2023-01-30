@@ -19,8 +19,9 @@ from django.urls import include, path
 from cronos import authentication
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("exams/", include("exams.urls")),
-    path("login/", authentication.kerberos_login, name="login"),
-    path("registrar/", include("registrar.urls")),
+    path(r"admin/", admin.site.urls),
+    path(r"login/", authentication.kerberos_login, name="login"),
+
+    path(r"", include("registrar.urls")),
+    path(r"<int:year>/<str:season>/<str:course_number>/exams/", include("exams.urls")),
 ]
