@@ -26,6 +26,7 @@
         <th>Quiz</th>
         <th>Start</th>
         <th>End</th>
+        <th>Location</th>
       </tr>
     </thead>
     <tbody class="table-group-divider">
@@ -34,29 +35,57 @@
           <td>
             <a href="{% url 'exams:quiz' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number quiz.identifier %}">
               {{ quiz.name }}
-            </a></td>
-          <td>
-            {% if quiz.accommodated %}
+            </a>
+          </td>
+          {% if quiz.my_accommodation_requests and quiz.my_accommodation_requests.0.accommodation %}
+            <td>
               <small class="text-muted">{{ quiz.start }}</small>
               <br>
-              <em>See accommodation.</em>
-            {% else %}
-              {{ quiz.start }}
-            {% endif %}
-          </td>
-          <td>
-            {% if quiz.accommodated %}
+              <span class="text-success">
+                <strong>Changed to:</strong>
+                {{ quiz.my_accommodation_requests.0.accommodation.start }}
+              </span>
+            </td>
+            <td>
               <small class="text-muted">{{ quiz.end }}</small>
               <br>
-              <em>See accommodation.</em>
-            {% else %}
-              {{ quiz.end }}
-            {% endif %}
-          </td>
+              <span class="text-success">
+                <strong>Changed to:</strong>
+                {{ quiz.my_accommodation_requests.0.accommodation.end }}
+              </span>
+            </td>
+          {% elif quiz.my_accommodation_requests %}
+            <td>
+              <small class="text-muted">{{ quiz.start }}</small>
+              <br>
+              <span class="text-danger">
+                <em>Accommodation requested</em>
+              </span>
+            </td>
+            <td>
+              <small class="text-muted">{{ quiz.end }}</small>
+              <br>
+              <span class="text-danger">
+                <em>Accommodation requested</em>
+              </span>
+            </td>
+          {% else %}
+            <td>{{ quiz.start }}</td>
+            <td>{{ quiz.end }}</td>
+          {% endif %}
+          {% if quiz.my_accommodation_requests and quiz.my_accommodation_requests.0.accommodation %}
+            <td class="align-bottom">
+              {{ quiz.my_accommodation_requests.0.accommodation.location }}
+            </td>
+          {% else %}
+            <td>
+              <em>See course information</em>
+            </td>
+          {% endif %}
         </tr>
       {% empty %}
         <tr>
-          <td colspan=3>
+          <td colspan=4>
             <em>(None)</em>
           </td>
         </tr>

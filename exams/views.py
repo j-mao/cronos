@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Exists, OuterRef
+from django.db.models import Exists, OuterRef, Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
@@ -39,7 +39,9 @@ def course(request, *, year, season, course_number):
     else:
         raise PermissionDenied
 
-    quizzes = Quiz.objects.filter(course=course).annotate(accommodated=Exists(AccommodationRequest.objects.filter(quiz=OuterRef("pk"), student=request.user, accommodation__isnull=False))).order_by("start")
+    quizzes = Quiz.objects.filter(course=course).order_by("start").prefetch_related(
+        Prefetch("accommodation_requests", queryset=AccommodationRequest.objects.filter(student=request.user), to_attr="my_accommodation_requests")
+    )
     return render(request, "exams/course.html", {"form": form, "course": course, "quizzes": quizzes, "is_instructor": is_instructor})
 
 

@@ -1,6 +1,6 @@
 from django.core.mail import send_mail
 from django.db import models, transaction
-from django.utils.timezone import localtime
+from django.template import engines
 
 from registrar.models import Course, User
 
@@ -26,9 +26,8 @@ class Accommodation(models.Model):
     comments = models.CharField(max_length=1024, help_text="Any specific details of the accommodation.")
 
     def __str__(self):
-        start = localtime(self.start).strftime("%c")
-        end = localtime(self.end).strftime("%c")
-        return f"{self.location} from {start} to {end}. {self.comments}"
+        template = engines["django"].from_string("{{ location }} from {{ start }} to {{ end }}; {{ comments }}")
+        return template.render(context=self.__dict__)
 
 
 class AccommodationRequest(models.Model):
