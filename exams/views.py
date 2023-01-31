@@ -206,6 +206,7 @@ def accommodation_request(request, *, year, season, course_number, quiz_identifi
         form = form_cls(request.POST, request.FILES, quiz=quiz, student=student, author=request.user, initial=initial)
         if form.is_valid():
             message = form.save()
+            message.send_email_notifications(request=request)
             accommodation_request = message.request
             accommodation_request.read_by.remove(*accommodation_request.read_by.exclude(pk=request.user.pk).all())
             return HttpResponseRedirect(reverse("exams:accommodation-request", kwargs={"year": year, "season": season, "course_number": course_number, "quiz_identifier": quiz_identifier, "username": username}))

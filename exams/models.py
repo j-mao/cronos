@@ -1,9 +1,12 @@
 import os
+import re
 import uuid
 
 from django.core.mail import send_mail
 from django.db import models, transaction
 from django.template import engines
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 from registrar.models import Course, User
 
@@ -49,6 +52,10 @@ def message_attachment_path(instance, filename):
     return os.path.join(instance.author.username, str(uuid.uuid4()), filename)
 
 
+def convert_html_to_plaintext(html_message):
+    return re.sub("[ \t]+", " ", strip_tags(html_message)).replace("\n ", "\n").strip()
+
+
 class Message(models.Model):
     request = models.ForeignKey(AccommodationRequest, on_delete=models.CASCADE, help_text="The request this message is for.", related_name="messages")
     created = models.DateTimeField(auto_now_add=True, help_text="When this message was posted.")
@@ -70,23 +77,25 @@ class Message(models.Model):
             if self.request.accommodation != latest.accommodation:
                 self.request.accommodation = latest.accommodation
                 self.request.save(update_fields=["accommodation"])
-        # Send mail to notify of update
-        recipients = (
-            list(self.request.quiz.course.instructors.all())
-            if self.author == self.request.student
-            else [self.request.student]
-        )
-        send_mail(
-            subject=f"[cronos] Accommodation request for {self.request.quiz.name}",
-            message=f"""
-Hello! There was an update to the accommodation request by {self.request.student.username} for {self.request.quiz.name}.
-Please visit Cronos to view the message.
 
-Do not reply to this email.
-            """,
+    def send_email_notifications(self, *, request):
+        html_message = render_to_string("exams/email.html", {"message": self, "is_instructor": False, "is_author": self.author == self.request.student}, request=request)
+        send_mail(
+            subject=f"Your accommodation request for {self.request.quiz.name}",
+            message=convert_html_to_plaintext(html_message),
             from_email=None,
-            recipient_list=[recipient.email for recipient in recipients],
+            recipient_list=[self.request.student.email],
+            html_message=html_message,
         )
+        if self.author == self.request.student:
+            html_message = render_to_string("exams/email.html", {"message": self, "is_instructor": True, "is_author": False}, request=request)
+            send_mail(
+                subject=f"Student accommodation request for {self.request.quiz.name}",
+                message=convert_html_to_plaintext(html_message),
+                from_email=None,
+                recipient_list=[instructor.email for instructor in self.request.quiz.course.instructors.all()],
+                html_message=html_message,
+            )
 
     def attachment_filename(self):
         return os.path.basename(self.attachment.name)
