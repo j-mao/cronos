@@ -1,3 +1,6 @@
+import os
+import uuid
+
 from django.core.mail import send_mail
 from django.db import models, transaction
 from django.template import engines
@@ -42,11 +45,16 @@ class AccommodationRequest(models.Model):
         ]
 
 
+def message_attachment_path(instance, filename):
+    return os.path.join(instance.author.username, str(uuid.uuid4()), filename)
+
+
 class Message(models.Model):
     request = models.ForeignKey(AccommodationRequest, on_delete=models.CASCADE, help_text="The request this message is for.", related_name="messages")
     created = models.DateTimeField(auto_now_add=True, help_text="When this message was posted.")
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, help_text="The message author.", related_name="messages")
     body = models.TextField(max_length=10000, blank=True, help_text="The message content.")
+    attachment = models.FileField(null=True, blank=True, upload_to=message_attachment_path, help_text="Any file attachments to the message.")
     accommodation = models.ForeignKey(Accommodation, on_delete=models.RESTRICT, null=True, blank=True, help_text="The accommodation assigned as part of this message.", related_name="messages")
     update_accommodation = models.BooleanField(help_text="Whether this message updated the accommodation.")
 
@@ -79,3 +87,6 @@ Do not reply to this email.
             from_email=None,
             recipient_list=[recipient.email for recipient in recipients],
         )
+
+    def attachment_filename(self):
+        return os.path.basename(self.attachment.name)

@@ -53,7 +53,7 @@ class AbstractMessageForm(forms.ModelForm):
 
     class Meta:
         model = Message
-        fields = ["body", "update_accommodation"]
+        fields = ["body", "attachment", "update_accommodation"]
 
     def __init__(self, *args, quiz: Quiz, student: User, author: User, **kwargs):
         super().__init__(*args, **kwargs)
@@ -93,7 +93,7 @@ class MessageRemoveAccommodationForm(AbstractMessageForm):
 
 class MessageUseExistingAccommodationForm(AbstractMessageForm):
     class Meta(AbstractMessageForm.Meta):
-        fields = ["body", "update_accommodation", "accommodation"]
+        fields = ["body", "attachment", "update_accommodation", "accommodation"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -114,7 +114,7 @@ class MessageCreateNewAccommodationForm(AbstractMessageForm):
     comments = forms.CharField(max_length=1024, required=False)
 
     class Meta(AbstractMessageForm.Meta):
-        fields = ["body", "update_accommodation", "location", "start", "end", "comments"]
+        fields = ["body", "attachment", "update_accommodation", "location", "start", "end", "comments"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

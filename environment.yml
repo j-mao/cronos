@@ -6,3 +6,4 @@ dependencies:
   - flup=1.0.3
   - python-ldap=3.4.0
   - pytz=2022.7.1
+  - whitenoise=6.3.0

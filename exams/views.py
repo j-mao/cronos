@@ -203,7 +203,7 @@ def accommodation_request(request, *, year, season, course_number, quiz_identifi
         "end": make_naive(quiz.end),
     }
     if request.method == "POST":
-        form = form_cls(request.POST, quiz=quiz, student=student, author=request.user, initial=initial)
+        form = form_cls(request.POST, request.FILES, quiz=quiz, student=student, author=request.user, initial=initial)
         if form.is_valid():
             message = form.save()
             accommodation_request = message.request
