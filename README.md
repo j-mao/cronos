@@ -42,7 +42,8 @@ Install [Miniforge][miniforge] using the download script for x86 Linux. Then:
    #!/afs/csail.mit.edu/proj/courses/6.046/miniforge3/envs/cronos/bin/python
    ```
 1. In `cronos/settings.py`, configure a production-secure `SECRET_KEY`, set `DEBUG` to
-   `False`, set `ALLOWED_HOSTS`.
+   `False`, set `ALLOWED_HOSTS`. Also set `STATIC_URL` and `MEDIA_URL` to refer to
+   absolute paths inside your locker.
 
 ### Setting up MySQL
 
