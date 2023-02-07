@@ -6,7 +6,7 @@ from django.utils.text import gettext_lazy as _
 from django.utils.text import slugify
 from django.utils.timezone import make_aware
 
-from registrar.models import User
+from oidc.models import User
 
 from .models import Accommodation, AccommodationRequest, Message, Quiz
 

@@ -102,7 +102,7 @@
         {% for accommodation_request in accommodation_requests %}
           <tr>
             <td>
-              <a href="{% url 'exams:accommodation-request' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number request.resolver_match.kwargs.quiz_identifier accommodation_request.student.username %}">{{ accommodation_request.student.username }}</a>
+              <a href="{% url 'exams:accommodation-request' request.resolver_match.kwargs.year request.resolver_match.kwargs.season request.resolver_match.kwargs.course_number request.resolver_match.kwargs.quiz_identifier accommodation_request.student.username %}">{{ accommodation_request.student.preferred_username }}</a>
               {% if not accommodation_request.read %}
                 <span class="badge text-bg-danger">Updated</span>
               {% endif %}

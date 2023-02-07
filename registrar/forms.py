@@ -4,8 +4,6 @@ from django.db import transaction
 from django.forms import inlineformset_factory
 from django.utils.text import gettext_lazy as _
 
-from cronos.authentication import get_or_create_mit_user
-
 from .models import Course, CourseListing, Term, TermSeason, User
 
 
@@ -52,24 +50,24 @@ class CourseForm(forms.ModelForm):
             self.fields["season"].disabled = True
             self.fields["season"].initial = self.instance.term.season
             self.fields["numbers"].initial = ", ".join(listing.number for listing in self.instance.listings.all())
-            self.fields["instructor_usernames"].initial = ", ".join(instructor.username for instructor in self.instance.instructors.all())
+            self.fields["instructor_usernames"].initial = ", ".join(instructor.preferred_username for instructor in self.instance.instructors.all())
         else:
-            self.fields["instructor_usernames"].initial = user.username
+            self.fields["instructor_usernames"].initial = user.preferred_username
 
     def clean_numbers(self):
         numbers = [number.strip() for number in self.cleaned_data["numbers"].split(",")]
         return numbers
 
     def clean_instructor_usernames(self):
-        usernames = {username.strip() for username in self.cleaned_data["instructor_usernames"].split(",")}
-        for username in usernames:
+        usernames = list({username.strip() for username in self.cleaned_data["instructor_usernames"].split(",")})
+        for i, username in enumerate(usernames):
             try:
-                get_or_create_mit_user(username)
-            except ValueError:
-                raise ValidationError(
-                    _("Unknown username."),
-                    code="unknown_username",
-                )
+                user = User.objects.filter(preferred_username=username).order_by("-date_joined")[:1].get()
+                usernames[i] = user.username
+            except User.DoesNotExist:
+                raise ValidationError(_("Unknown username."), code="unknown_username")
+            else:
+                usernames
         if self._user.username not in usernames:
             raise ValidationError(
                 _("You cannot cause yourself to lose instructor status."),

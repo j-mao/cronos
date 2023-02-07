@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 from pathlib import Path
 
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +27,7 @@ SECRET_KEY = "django-insecure-xdk)n0_os6j7t6elje25fmq+szf+@dsjy)0@-cuu*!pf9yztbe
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = []  # TODO: configure
 
 
 # Application definition
@@ -37,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "oidc",
     "registrar",
     "exams",
 ]
@@ -51,7 +54,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "cronos.middleware.TimezoneMiddleware",
-    "cronos.middleware.ScriptsRemoteUserMiddleware",
 ]
 
 ROOT_URLCONF = "cronos.urls"
@@ -89,16 +91,19 @@ DATABASES = {
 # Custom user model
 # https://docs.djangoproject.com/en/4.0/topics/auth/customizing
 
-AUTH_USER_MODEL = "registrar.User"
+AUTH_USER_MODEL = "oidc.User"
 
 AUTHENTICATION_BACKENDS = [
-    "cronos.authentication.ScriptsRemoteUserBackend",
+    "oidc.auth.OpenIDCBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
 
-MIT_SCRIPT_PREFIX = "/cronos"
-LOGIN_URL = MIT_SCRIPT_PREFIX + "/login/"
-LOGIN_REDIRECT_URL = MIT_SCRIPT_PREFIX + "/registrar/"
+AUTHLIB_OAUTH_CLIENTS = {}  # TODO: configure
+
+SESSION_COOKIE_SECURE = True
+
+LOGIN_URL = reverse_lazy("oidc:login")
+LOGIN_REDIRECT_URL = reverse_lazy("registrar:index")
 
 
 # Emails

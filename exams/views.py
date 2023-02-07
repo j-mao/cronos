@@ -7,7 +7,8 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import make_naive
 
-from registrar.models import Course, User
+from oidc.models import User
+from registrar.models import Course
 
 from .forms import (MessageCreateNewAccommodationForm,
                     MessageNoChangeAccommodationForm,
@@ -66,7 +67,7 @@ def quiz(request, *, year, season, course_number, quiz_identifier):
         raise PermissionDenied
 
     accommodations = Accommodation.objects.filter(quiz=quiz, accommodation_requests__isnull=False).distinct()
-    accommodation_requests = AccommodationRequest.objects.filter(quiz=quiz).annotate(read=Exists(request.user.read_accommodation_requests.filter(pk=OuterRef("pk")))).order_by("read", "student__last_name", "student__first_name", "student__username")
+    accommodation_requests = AccommodationRequest.objects.filter(quiz=quiz).annotate(read=Exists(request.user.read_accommodation_requests.filter(pk=OuterRef("pk")))).order_by("read", "student__last_name", "student__first_name", "student__preferred_username")
     return render(request, "exams/quiz.html", {"quiz": quiz, "accommodations": accommodations, "accommodation_requests": accommodation_requests})
 
 
