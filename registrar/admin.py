@@ -1,7 +1,6 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 
-from .models import Course, CourseListing, Term, User
+from .models import Course, CourseListing, Term
 
 
 @admin.register(Term)
@@ -16,6 +15,3 @@ class CourseListingInline(admin.TabularInline):
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     inlines = [CourseListingInline]
-
-
-admin.site.register(User, UserAdmin)

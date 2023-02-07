@@ -7,7 +7,6 @@ from .forms import ClassJoinForm, CourseForm
 from .models import Course, CourseListing, Term
 
 
-@login_required
 def index(request):
     terms = Term.objects.filter(courses__isnull=False).distinct().order_by("-year", "-season")
     return render(request, "registrar/index.html", {"terms": terms})

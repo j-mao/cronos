@@ -18,11 +18,9 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from cronos import authentication
-
 urlpatterns = [
     path(r"admin/", admin.site.urls),
-    path(r"login/", authentication.kerberos_login, name="login"),
+    path(r"", include("oidc.urls")),
 
     path(r"", include("registrar.urls")),
     path(r"<int:year>/<str:season>/<str:course_number>/exams/", include("exams.urls")),

@@ -25,7 +25,7 @@
       </a>
     </li>
     <li class="breadcrumb-item active" aria-current="page">
-      Request from {{ request.resolver_match.kwargs.username }}
+      Request from {{ student.preferred_username }}
     </li>
   {% else %}
     <li class="breadcrumb-item active" aria-current="page">
@@ -39,7 +39,7 @@
   <h2>
     Accommodation request for
     {{ student.first_name }} {{ student.last_name }}
-    ({{ request.resolver_match.kwargs.username }})
+    ({{ student.preferred_username }})
     on
     {{ quiz.name }}
   </h2>

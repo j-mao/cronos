@@ -15,7 +15,7 @@
         <span class="navbar-text">
           {% if user.is_authenticated %}
             <strong>{{ user.first_name }} {{ user.last_name }}</strong>
-            ({{ user.username }})
+            ({{ user.preferred_username }})
           {% else %}
             Not logged in
           {% endif %}

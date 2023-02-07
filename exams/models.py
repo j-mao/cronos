@@ -8,7 +8,8 @@ from django.template import engines
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
-from registrar.models import Course, User
+from oidc.models import User
+from registrar.models import Course
 
 
 class Quiz(models.Model):

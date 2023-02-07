@@ -46,7 +46,7 @@
       <tbody class="table-group-divider">
         {% for accommodation_request in accommodation_requests %}
           <tr>
-            <td>{{ accommodation_request.student.username }}</td>
+            <td>{{ accommodation_request.student.preferred_username }}</td>
             <td>{{ accommodation_request.student.first_name }}</td>
             <td>{{ accommodation_request.student.last_name }}</td>
             <td>{{ accommodation_request.accommodation.location }}</td>
