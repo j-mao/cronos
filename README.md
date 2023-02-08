@@ -47,8 +47,8 @@ Install [Miniforge][miniforge] using the download script for x86 Linux. Then:
 
 ### Setting up MySQL
 
-1. Create a database at [CSAIL MySQL](mysql.csail.mit.edu).
-1. Configure `DATABASES` in `cronossettings.py` to point to it.
+1. Create a database at [CSAIL MySQL](https://mysql.csail.mit.edu).
+1. Configure `DATABASES` in `cronos/settings.py` to point to it.
 1. Initialize your database!
    ```bash
    ./manage.py migrate
@@ -56,14 +56,14 @@ Install [Miniforge][miniforge] using the download script for x86 Linux. Then:
 
 ### Setting up OIDC
 
-1. Register a client at the [MIT OIDC Pilot](oidc.mit.edu).
+1. Register a client at the [MIT OIDC Pilot](https://oidc.mit.edu).
 1. Configure `AUTHLIB_OAUTH_CLIENTS` to point to it.
 
 ### Caveat
 
 Authlib assumes that JWS specifies `kid`, but it [doesn't actually have to][oidc-kid].
-This causes some HTTP 500s. To fix this, find `sync_openid.py` in your conda
-environment, and make the following change:
+This causes some HTTP 500s with MIT OIDC. To fix this, find `sync_openid.py` in your
+conda environment, and make the following change:
 ```diff
 40c40
 <                 return jwk_set.find_by_kid(header.get('kid'))
