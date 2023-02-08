@@ -29,4 +29,8 @@ urlpatterns = [
          views.accommodation_request,
          name="accommodation-request",
          ),
+    path(r"<slug:quiz_identifier>/request/<str:username>/attachment/<int:message_id>",
+         views.attachment,
+         name="attachment",
+         ),
 ]

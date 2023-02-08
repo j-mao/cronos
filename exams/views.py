@@ -1,7 +1,9 @@
+import os
+
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Exists, OuterRef, Prefetch
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -220,3 +222,43 @@ def accommodation_request(request, *, year, season, course_number, quiz_identifi
     ).order_by("-created")
 
     return render(request, "exams/request.html", {"form": form, "quiz": quiz, "student": student, "accommodation": accommodation, "messages": messages, "is_instructor": is_instructor, "accommodation_types": accommodation_types})
+
+
+@login_required
+def attachment(request, *, year, season, course_number, quiz_identifier, username, message_id):
+    course = get_object_or_404(
+        Course.objects.all(),
+        term__year=year,
+        term__season=season,
+        listings__number=course_number,
+    )
+    get_object_or_404(
+        Quiz.objects.all(),
+        course=course,
+        identifier=quiz_identifier,
+    )
+
+    is_instructor = course.instructors.filter(pk=request.user.pk).exists()
+    is_student = course.students.filter(pk=request.user.pk).exists()
+    if is_student and username != request.user.username:
+        raise PermissionDenied
+
+    student = get_object_or_404(
+        User.objects.all(),
+        username=username,
+    )
+    message = get_object_or_404(
+        Message.objects.all(),
+        pk=message_id,
+    )
+    if not is_instructor and message.request.student != student:
+        raise PermissionDenied
+    if not message.attachment:
+        return Http404
+
+    fname = os.path.basename(message.attachment.name)
+    with message.attachment.open("rb") as f:
+        response = HttpResponse(f.read(), content_type="application/octet-stream", headers={
+            "Content-Disposition": f'attachment; filename="{fname}"',
+        })
+        return response

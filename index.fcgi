@@ -1,13 +1,16 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import threading
 import time
 
 from flup.server.fcgi import WSGIServer
 
-import cronos
-from cronos.wsgi import application
+sys.path.append("/")  # TODO: configure
+
+import cronos  # noqa: E402
+from cronos.wsgi import application  # noqa: E402
 
 os.environ["DJANGO_SETTINGS_MODULE"] = "cronos.settings"
 

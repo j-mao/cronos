@@ -35,12 +35,14 @@ Install [Miniforge][miniforge] using the download script for x86 Linux. Then:
 
 ### Importing the Cronos project
 
-1. Clone Cronos into your locker at a web-accessible subdirectory.
+1. Clone Cronos into your locker at a non-web-accessible location.
 1. In `manage.py` and `index.fcgi`, change the shebang to the `python` installed in your
    conda environment. For example, mine looks like this:
    ```python
    #!/afs/csail.mit.edu/proj/courses/6.046/miniforge3/envs/cronos/bin/python
    ```
+1. Copy `index.fcgi` and `.htaccess` to a web-accessible location. Configure the path
+   in `index.fcgi` to point to where the repository is cloned.
 1. In `cronos/settings.py`, configure a production-secure `SECRET_KEY`, set `DEBUG` to
    `False`, set `ALLOWED_HOSTS`. Also set `STATIC_URL` and `MEDIA_URL` to refer to
    absolute paths inside your locker.
